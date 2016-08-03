@@ -11,7 +11,20 @@ int main(int argc, char *argv[]){
   //-o is followed the output png
   //-r is followd by the rotation angle in degrees (float) <optional for user>
   //-g is whether th png should be grayed <optional for user>
-  
+ int i =  1;
+ while(i < argc){
+  if(strcmp("-i", argv[i]) == 0){
+	inputfile = argv[++i];
+  } else if(strcmp("-o", argv[i]) == 0){
+	outputfile = argv[++i];
+  } else if(strcmp("-r", argv[i]) == 0){
+	degrees = atoi(argv[++i]);
+  } else if(strcmp("-g", argv[i]) == 0){
+	grayFlag = 1;
+  }
+  i++;
+ }   
+
   pixMap *p=pixMap_init_filename(inputfile);
   if(degrees)pixMap_rotate(p,degrees);
   if(grayFlag)pixMap_gray(p);
