@@ -1,5 +1,6 @@
 #include "pixutils.h"
 #include "lodepng.h"
+#include "bmp.h"
 
 //private methods
 static pixMap *pixMap_init(); //allocate memory for pixMap object, set variables to zero, and return a pointer to the object
@@ -213,3 +214,34 @@ int pixMap_write(pixMap *p,char *filename){
 	if(error) printf("error %u: %s\n", error, lodepng_error_text(error));
 	return 0;
 }	 
+
+//ASSIGNMENT 4 FUNCTIONS
+//write 16 bit bmp to output file
+void pixMap_write_bmp16(pixMap *p,char *filename){
+	BMP16_map *map = BMP16_map_init(p->height,p->width,0,5,6,5);
+	for(int i = 0; i < p->width; i++){
+		for(int j = 0; j < p->height; j++){
+			rgba color = p->pixArray[i][j];
+			uint16_t r = color.r >> 3;
+			uint16_t g = color.g >> 2;
+			uint16_t b = color.b >> 3;
+			
+			uint16_t temp = (r << 11) | (g << 5) | (b);
+			map->pixArray[i][p->height - j] = temp;
+		}
+	}
+	BMP16_write(map,filename);
+	BMP16_map_destroy(map);
+}
+
+static int pixMap_cmp(const void *a, const void *b){
+	const rgba *ra = (rgba*) a;
+	const rgba *rb = (rgba*) b;
+	return ((ra->r - rb->r) + (ra->g - rb->g) + (ra->b - rb->b));
+}
+
+//sort colors of the pixMap by total of r,g,b values
+void pixMap_sort(pixMap *p){
+	qsort(p->image,p->width * p->height,sizeof(rgba), pixMap_cmp);
+}
+
